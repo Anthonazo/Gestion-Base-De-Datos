@@ -1,17 +1,13 @@
-<<<<<<< HEAD
+
+--Creacion de usuario con privilegios de transacciones
 alter session set "_ORACLE_SCRIPT"=true;
 CREATE USER usr_compras
 IDENTIFIED by clave;
-
-
-GRANT DBA TO usr_compras;
-
-
 GRANT SELECT ANY TABLE TO usr_compras;
 GRANT UPDATE ANY TABLE TO usr_compras;
 GRANT INSERT ANY TABLE TO usr_compras;
-=======
-- Creacion de datos
+
+-- Creacion de datos
 
 CREATE TABLE PROVEEDORES(
  PROVEEDORID int NOT NULL,
@@ -103,7 +99,7 @@ CREATE TABLE DETALLE_COMPRAS (
 
 -- DATOS 
 
-- Insercion de tuplas
+-- Insercion de tuplas
 
 
 insert into categorias (categoriaid, nombrecat) values (100, 'CARNICOS');
@@ -280,4 +276,3 @@ INSERT INTO DETALLE_ORDENES VALUES(22,2,3,3);
 INSERT INTO DETALLE_ORDENES VALUES(22,3,4,3);
 INSERT INTO DETALLE_ORDENES VALUES(22,4,5,2);
 INSERT INTO DETALLE_ORDENES VALUES(22,5,6,3);
->>>>>>> fork_new/patch-1
