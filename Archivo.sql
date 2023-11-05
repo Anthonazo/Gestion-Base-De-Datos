@@ -425,13 +425,13 @@ DECLARE
     v_accion VARCHAR2(10);
 BEGIN
     IF INSERTING THEN
-        v_accion := 'INSERCIÓN';
+        v_accion := 'INSERCIï¿½N';
             DBMS_OUTPUT.PUT_LINE('Accion: ' || v_accion);
     ELSIF UPDATING THEN
-        v_accion := 'ACTUALIZACIÓN';
+        v_accion := 'ACTUALIZACIï¿½N';
             DBMS_OUTPUT.PUT_LINE('Accion: ' || v_accion);
     ELSIF DELETING THEN
-        v_accion := 'ELIMINACIÓN';
+        v_accion := 'ELIMINACIï¿½N';
             DBMS_OUTPUT.PUT_LINE('Accion: ' || v_accion);
     END IF;
     INSERT INTO AUDITORIA_CLIENTES (ACCION, FECHA)
@@ -440,6 +440,32 @@ END;
 /
 INSERT INTO CLIENTES VALUES (11,'183445667','YARBANTRELLA','PABLO POLIT','AV.REPUBLICA',NULL,NULL,NULL,NULL);
 SELECT * FROM AUDITORIA_CLIENTES;
+
+---------------------SEGUNDO TRIGGER-------------------------
+SET SERVEROUTPUT ON;
+CREATE OR REPLACE TRIGGER trigger_DetCompras
+    BEFORE INSERT OR UPDATE ON detalle_compras
+    FOR EACH ROW
+DECLARE
+    accionT varchar2(10);
+BEGIN
+    CASE
+        WHEN INSERTING THEN
+            accionT := 'INSERT';
+            UPDATE PRODUCTOS SET EXISTENCIA = EXISTENCIA + :new.CANTIDAD WHERE PRODUCTOID = :new.PRODUCTOID;
+        WHEN UPDATING('CANTIDAD') THEN
+            accionT := 'UPDATE';
+            UPDATE PRODUCTOS SET EXISTENCIA = EXISTENCIA + :new.CANTIDAD WHERE PRODUCTOID = :new.PRODUCTOID;
+    END CASE;
+    
+    DBMS_OUTPUT.PUT_LINE('ACCION:'|| accionT);
+END;
+/
+--INSERT INTO DETALLE_COMPRAS VALUES (10, 22, 3, 13, 4.70);
+UPDATE DETALLE_COMPRAS SET CANTIDAD = 20 WHERE COMPRAID = 6;
+
+---------------------TERCER TRIGGER-------------------------
+
 
 
 
@@ -479,4 +505,33 @@ BEGIN
     total := cantProdMayor();
     DBMS_OUTPUT.PUT_LINE('El Cliente es: ' || total);
 END;
+
+
+--------------------EJERCICIO 2------------------------------
+--b.	El proveedor a quien se le compra en mayor cantidad (valor de la compra)--
+CREATE OR REPLACE PROCEDURE ComprasProveedor(provID OUT NUMBER, nombre OUT VARCHAR, cantidad OUT NUMBER) IS 
+BEGIN
+    SELECT PROVEEDORID, NOMBREPROV, NVL(CANTIDAD_TOTAL_VALOR, 0) AS VALOR_TOTAL_COMPRADO INTO provID, nombre, cantidad
+FROM (
+    SELECT P.PROVEEDORID, P.NOMBREPROV, NVL((SELECT SUM(D.CANTIDAD * PR.PRECIOUNIT) FROM DETALLE_COMPRAS D JOIN PRODUCTOS PR ON D.PRODUCTOID = PR.PRODUCTOID WHERE D.COMPRAID IN (
+                    SELECT CM.COMPRAID FROM COMPRAS CM WHERE CM.PROVEEDORID = P.PROVEEDORID )),0) AS CANTIDAD_TOTAL_VALOR FROM PROVEEDORES P ORDER BY CANTIDAD_TOTAL_VALOR DESC) WHERE ROWNUM = 1;
+END ComprasProveedor;
+/
+
+DECLARE
+  provID NUMBER;
+  nombre VARCHAR(50);
+  cantidad NUMBER;
+BEGIN
+  ComprasProveedor(provID, nombre, cantidad);
+  DBMS_OUTPUT.PUT_LINE('El proveedor al que mÃ¡s se le compra es:');
+  DBMS_OUTPUT.PUT_LINE('PROVEEDOR ID: ' || provID);
+  DBMS_OUTPUT.PUT_LINE('NOMBRE PROVEEDOR: ' || nombre);
+  DBMS_OUTPUT.PUT_LINE('CANTIDAD DE VALOR COMPRADO: ' || cantidad);
+END;
+/
+
+--------------------EJERCICIO 3------------------------------
+--c.	La ganancia por producto(diferencia entre precio y venta y precio de compra)--
+
 
