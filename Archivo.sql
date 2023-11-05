@@ -1,5 +1,7 @@
 
---Creacion de usuario con privilegios de transacciones
+--------------------------Creacion de usuario con privilegios de transacciones-------------------------
+-------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------
 alter session set "_ORACLE_SCRIPT"=true;
 CREATE USER usr_compras
 IDENTIFIED by clave;
@@ -7,8 +9,11 @@ GRANT SELECT ANY TABLE TO usr_compras;
 GRANT UPDATE ANY TABLE TO usr_compras;
 GRANT INSERT ANY TABLE TO usr_compras;
 
--- Creacion de datos
 
+
+-------------------------------------------Creacion de tablas-----------------------------------------
+------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------
 CREATE TABLE PROVEEDORES(
  PROVEEDORID int NOT NULL,
  NOMBREPROV char(50) NOT NULL,
@@ -78,6 +83,9 @@ CONSTRAINT FK_DETALLE__ORDEN_DET_ORDENES FOREIGN KEY (ORDENID) REFERENCES ORDENE
 CONSTRAINT FK_DETALLE__PROD_DETA_PRODUCTO FOREIGN KEY (PRODUCTOID) REFERENCES PRODUCTOS(PRODUCTOID)
  );
  
+----------------TABLAS NUEVAS--------------------
+-------------------------------------------------
+-------------------------------------------------
  CREATE TABLE COMPRAS (
   COMPRAID int NOT NULL,
   PROVEEDORID int NOT NULL,
@@ -97,11 +105,15 @@ CREATE TABLE DETALLE_COMPRAS (
   CONSTRAINT FK_DETALLE_COMPRAS_PRODUCTO FOREIGN KEY (PRODUCTOID) REFERENCES PRODUCTOS(PRODUCTOID)
 );
 
--- DATOS 
+ALTER TABLE DETALLE_COMPRAS
+DROP COLUMN PRECIO_UNITARIO;
 
--- Insercion de tuplas
 
 
+
+--------------------------------------Insercion de tuplas--------------------------------------------
+-----------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------
 insert into categorias (categoriaid, nombrecat) values (100, 'CARNICOS');
 insert into categorias (categoriaid, nombrecat) values (200, 'LACTEOS');
 insert into categorias (categoriaid, nombrecat) values (300, 'LIMPIEZA');
@@ -205,9 +217,10 @@ insert into detalle_ordenes values(9,1,11,10);
 
 insert into detalle_ordenes values(10,1,1,5);
 
----------------------------------------------------------
--------- ORDENES ---------------------------------------
---------------------------------------------------------
+
+------------------------------ORDENES--------------------------------------
+---------------------------------------------------------------------------
+---------------------------------------------------------------------------
 
 INSERT INTO ORDENES VALUES(12,4,2,'01-01-20',10);
 INSERT INTO ORDENES VALUES(13,1,8,'02-01-20',6);
@@ -276,3 +289,16 @@ INSERT INTO DETALLE_ORDENES VALUES(22,2,3,3);
 INSERT INTO DETALLE_ORDENES VALUES(22,3,4,3);
 INSERT INTO DETALLE_ORDENES VALUES(22,4,5,2);
 INSERT INTO DETALLE_ORDENES VALUES(22,5,6,3);
+
+
+
+
+----------------------------------------DATOS DE COMPRAS-------------------------------------------
+---------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
+
+INSERT INTO COMPRAS VALUES();
+
+
+
+
