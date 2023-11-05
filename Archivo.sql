@@ -409,8 +409,37 @@ INSERT INTO DETALLE_COMPRAS VALUES(10,10,1,17);
 --------------------------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------------------------
 
+---------------------PRIMER TRIGGER-------------------------
+-- Crear el trigger
 
-
+CREATE TABLE AUDITORIA_CLIENTES (
+    ID NUMBER GENERATED ALWAYS AS IDENTITY,
+    ACCION VARCHAR2(10),
+    FECHA TIMESTAMP
+);
+/
+CREATE OR REPLACE TRIGGER trgger1
+BEFORE INSERT OR UPDATE OR DELETE ON CLIENTES
+FOR EACH ROW
+DECLARE
+    v_accion VARCHAR2(10);
+BEGIN
+    IF INSERTING THEN
+        v_accion := 'INSERCIÓN';
+            DBMS_OUTPUT.PUT_LINE('Accion: ' || v_accion);
+    ELSIF UPDATING THEN
+        v_accion := 'ACTUALIZACIÓN';
+            DBMS_OUTPUT.PUT_LINE('Accion: ' || v_accion);
+    ELSIF DELETING THEN
+        v_accion := 'ELIMINACIÓN';
+            DBMS_OUTPUT.PUT_LINE('Accion: ' || v_accion);
+    END IF;
+    INSERT INTO AUDITORIA_CLIENTES (ACCION, FECHA)
+    VALUES (v_accion, SYSTIMESTAMP);
+END;
+/
+INSERT INTO CLIENTES VALUES (11,'183445667','YARBANTRELLA','PABLO POLIT','AV.REPUBLICA',NULL,NULL,NULL,NULL);
+SELECT * FROM AUDITORIA_CLIENTES;
 
 
 
@@ -418,4 +447,36 @@ INSERT INTO DETALLE_COMPRAS VALUES(10,10,1,17);
 ------------------------------------------FUNCIONES----PROCEDIMIENTOS-----------------------------------
 --------------------------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------------------------
+
+
+--------------------EJERCICIO 1------------------------------
+--a.	El cliente que adquiere mayor cantidad de productos--
+set serveroutput on
+CREATE OR REPLACE FUNCTION cantProdMayor RETURN CHAR IS 
+    mayor CHAR(50);
+BEGIN
+    SELECT NOMBRECONTACTO
+    INTO mayor
+FROM (
+    SELECT c.CLIENTEID, c.NOMBRECONTACTO, SUM(do.CANTIDAD) AS TOTAL_PRODUCTOS
+    FROM CLIENTES c
+    JOIN ORDENES o ON c.CLIENTEID = o.CLIENTEID
+    JOIN DETALLE_ORDENES do ON o.ORDENID = do.ORDENID
+    GROUP BY c.CLIENTEID, c.NOMBRECONTACTO
+    ORDER BY TOTAL_PRODUCTOS DESC)
+WHERE ROWNUM = 1;  
+    RETURN mayor;  
+    EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+            RETURN -1;
+        WHEN OTHERS THEN
+            RETURN 0;   
+END;
+/
+DECLARE
+    total CHAR(50);
+BEGIN
+    total := cantProdMayor();
+    DBMS_OUTPUT.PUT_LINE('El Cliente es: ' || total);
+END;
 
